@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PersonService {
@@ -16,12 +17,32 @@ public class PersonService {
         this.personRepository = personRepository;
     }
 
-    public Person addPerson(Person person){
+    public Person addPerson(Person person) {
         return personRepository.save(person);
     }
 
-    public List<Person> getAllPerson(){
+    public List<Person> getAllPerson() {
         return personRepository.findAll();
+    }
+
+    public void deletePersonByID(Long id) {
+        personRepository.deleteById(id);
+    }
+
+    public Person updatePersonByID(Long id, Person newPerson) {
+        Optional<Person> personMayBe = getPersonByID(id);
+        if (!personMayBe.isPresent()) {
+            throw new IllegalStateException("Person not found");
+        }
+        Person personToBeUpdated = personMayBe.get();
+        personToBeUpdated.setEmail(newPerson.getEmail());
+        personToBeUpdated.setMobileNumber(newPerson.getMobileNumber());
+        personToBeUpdated.setName(newPerson.getName());
+        return personRepository.save(personToBeUpdated);
+    }
+
+    public Optional<Person> getPersonByID(Long id) {
+        return personRepository.findById(id);
     }
 
 
